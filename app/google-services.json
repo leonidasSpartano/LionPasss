@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "990586248970",
+    "project_id": "lionpass-67a2f",
+    "storage_bucket": "lionpass-67a2f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990586248970:android:771b1d33826673ea19a4f3",
+        "android_client_info": {
+          "package_name": "com.example.lionpass"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8ECNGSntd1uWIC-HBj1AzBoQ_doL7gFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
