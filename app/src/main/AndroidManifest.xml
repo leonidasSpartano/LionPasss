@@ -15,6 +15,7 @@
         <activity android:name="UI.Login"/>
         <activity android:name="UI.Register"/>
         <activity android:name="UI.Home"/>
+        <activity android:name="UI.SecurityDetailsActivity"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

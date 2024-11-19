@@ -2,6 +2,7 @@ package UI;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -14,8 +15,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.lionpass.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.security.GeneralSecurityException;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import Model.Security;
 
@@ -23,6 +30,8 @@ public class AddPasswordDialogFragment extends DialogFragment {
 
     private EditText etEmail, etAppName, etUserName, etNotes, etPassword;
     private Button btnSave, btnCancel;
+
+    private static final String SECRET_KEY = "1234567890123456"; // Clave AES (debe tener 16 caracteres)
 
     @NonNull
     @Override
@@ -63,12 +72,33 @@ public class AddPasswordDialogFragment extends DialogFragment {
             return;
         }
 
+        // Obtener el correo del usuario logueado
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userEmail = auth.getCurrentUser() != null ? auth.getCurrentUser().getEmail() : null;
+
+        if (userEmail == null) {
+            Toast.makeText(getContext(), "No se pudo obtener el correo del usuario logueado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Encriptar la contraseña
+        String encryptedPassword;
+        try {
+            encryptedPassword = encrypt(password, SECRET_KEY);
+        } catch (GeneralSecurityException e) {
+            Toast.makeText(getContext(), "Error al encriptar la contraseña", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return;
+        }
+
         // Guardar en Firebase Realtime Database
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Security");
         String id = ref.push().getKey();
 
         if (id != null) {
-            Security security = new Security(id, mail, nameApp, nameUser, notes, password);
+            // Crear el objeto Security con el correo del usuario logueado
+            Security security = new Security(id, mail, nameApp, nameUser, notes, encryptedPassword,userEmail);
+            security.setUserEmail(userEmail); // Asignar el correo del usuario logueado
 
             ref.child(id).setValue(security)
                     .addOnCompleteListener(task -> {
@@ -82,5 +112,21 @@ public class AddPasswordDialogFragment extends DialogFragment {
         } else {
             Toast.makeText(getContext(), "Error al generar el ID", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Método para encriptar un texto usando AES
+     *
+     * @param data      Texto a encriptar
+     * @param secretKey Clave secreta de 16 caracteres
+     * @return Texto encriptado en Base64
+     * @throws GeneralSecurityException Si ocurre un error de cifrado
+     */
+    private String encrypt(String data, String secretKey) throws GeneralSecurityException {
+        SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(), "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+        return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
     }
 }
