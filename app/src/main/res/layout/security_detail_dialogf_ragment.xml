@@ -107,7 +107,7 @@
             android:id="@+id/btnEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="edit"
+            android:text="editar"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/black" />
 
