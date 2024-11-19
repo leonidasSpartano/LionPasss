@@ -1,3 +1,5 @@
+Manual de usuario
+
 1. Ventana de Bienvenida
   Presiona el botón Siguiente para avanzar a la ventana de inicio de sesión.
 
